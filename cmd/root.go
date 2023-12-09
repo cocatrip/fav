@@ -8,6 +8,11 @@ import (
 	"github.com/spf13/viper"
 )
 
+var (
+  Encrypt bool
+  Decrypt bool
+)
+
 var log = logger.GetLogger()
 
 var rootCmd = &cobra.Command{
@@ -26,6 +31,9 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
+
+  rootCmd.PersistentFlags().BoolVarP(&Encrypt, "encrypt", "e", false, "encrypt a file")
+  rootCmd.PersistentFlags().BoolVarP(&Decrypt, "decrypt", "d", false, "decrypt a file")
 }
 
 func initConfig() {
