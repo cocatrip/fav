@@ -40,7 +40,7 @@ func init() {
 
 func initConfig() {
 	viper.AddConfigPath(".")
-	viper.SetConfigFile(".fav.yaml")
+	viper.SetConfigName(".fav")
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Errorf("Can't read config: %v", err)
