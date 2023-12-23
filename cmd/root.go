@@ -32,6 +32,10 @@ func init() {
 
 	rootCmd.PersistentFlags().BoolP("encrypt", "e", false, "encrypt a file")
 	rootCmd.PersistentFlags().BoolP("decrypt", "d", false, "decrypt a file")
+
+	rootCmd.PersistentFlags().StringP("secret-file", "f", "", "path to the secret file")
+
+	rootCmd.PersistentFlags().StringP("secret-key", "k", "", "secret key to use")
 }
 
 func initConfig() {
