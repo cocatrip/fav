@@ -34,11 +34,17 @@ func init() {
 	rootCmd.PersistentFlags().BoolP("decrypt", "d", false, "decrypt a file")
 
 	rootCmd.PersistentFlags().StringP("secret-file", "f", "", "path to the secret file")
+	viper.BindPFlag("secret-file", rootCmd.PersistentFlags().Lookup("secret-file"))
 
 	rootCmd.PersistentFlags().StringP("secret-key", "k", "", "secret key to use")
+	viper.BindPFlag("secret-key", rootCmd.PersistentFlags().Lookup("secret-key"))
 }
 
 func initConfig() {
+	viper.AutomaticEnv()
+	viper.SetEnvPrefix("fav")
+	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
+
 	viper.AddConfigPath(".")
 	viper.SetConfigName(".fav")
 
