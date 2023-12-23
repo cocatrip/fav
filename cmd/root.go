@@ -19,7 +19,7 @@ var rootCmd = &cobra.Command{
 	Use:   "fav",
 	Short: "",
 	Long:  ``,
-	Args:  cobra.MinimumNArgs(1),
+	Args:  cobra.ExactArgs(1),
 }
 
 func Execute() {
