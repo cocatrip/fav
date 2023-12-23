@@ -15,6 +15,9 @@ var rootCmd = &cobra.Command{
 	Short: "",
 	Long:  ``,
 	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return nil
+	},
 }
 
 func Execute() {
