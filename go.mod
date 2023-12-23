@@ -2,11 +2,11 @@ module github.com/cocatrip/fav
 
 go 1.21.0
 
-require github.com/spf13/cobra v1.7.0
-
-require github.com/spf13/viper v1.16.0
-
-require github.com/sirupsen/logrus v1.9.3
+require (
+  github.com/spf13/cobra v1.7.0
+  github.com/spf13/viper v1.16.0
+  github.com/sirupsen/logrus v1.9.3
+)
 
 require gopkg.in/yaml.v3 v3.0.1 // indirect
 
