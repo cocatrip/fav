@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	"os"
+	"strings"
 
 	"filippo.io/age"
 	"filippo.io/age/armor"
@@ -65,9 +66,33 @@ func ageEncrypt(identity *age.X25519Identity, file string) error {
 
 	if err := armorWriter.Close(); err != nil {
 		log.Errorf("Failed to close armor: %v", err)
+
+func ageDecrypt(identity *age.X25519Identity, file *os.File) error {
+	content := make([]byte, util.GetFileSize(file))
+	if _, err := file.Read(content); err != nil {
+		return err
 	}
 
-	if err := os.WriteFile(file+".age", buf.Bytes(), 0644); err != nil {
+	out := &bytes.Buffer{}
+	f := strings.NewReader(string(content))
+	armorReader := armor.NewReader(f)
+
+	r, err := age.Decrypt(armorReader, identity)
+	if err != nil {
+		return err
+	}
+
+	if _, err := io.Copy(out, r); err != nil {
+		return err
+	}
+
+	decryptedFileName := strings.TrimSuffix(file.Name(), ".age")
+	decryptedFileMode := util.GetFileMode(file)
+	if err := os.WriteFile(decryptedFileName, out.Bytes(), decryptedFileMode); err != nil {
+		return err
+	}
+
+	if err := os.Remove(file.Name()); err != nil {
 		return err
 	}
 
