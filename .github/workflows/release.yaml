@@ -1,0 +1,55 @@
+---
+name: Release
+
+on:
+  push:
+    tags:
+      - v**
+
+jobs:
+  release-changelog:
+    name: Release Changelog
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 50
+      - uses: fregante/release-with-changelog@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: fav {tag}
+
+  releases-matrix:
+    needs: release-changelog
+    name: Release Binary
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [linux, windows, darwin]
+        goarch: [amd64]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: wangyoucao577/go-release-action@v1.25
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          goos: ${{ matrix.goos }}
+          goarch: ${{ matrix.goarch }}
+          binary_name: "fav"
+
+  releases-standalone:
+    needs: release-changelog
+    name: Release Standalone
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ">=1.17.0"
+      - run: |
+          GOOS=linux GOARCH=amd64 go build
+          GOOS=windows GOARCH=amd64 go build
+      - uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            fav
+            fav.exe
