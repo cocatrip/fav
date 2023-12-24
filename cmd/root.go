@@ -24,14 +24,36 @@ var rootCmd = &cobra.Command{
 		log.Infof("secretFile: %v\n", viper.Get("secret-file"))
 		secretFile := viper.GetString("secret-file")
 
-		crypto.Encrypt(secretFile, file)
+		encrypt, err := cmd.Flags().GetBool("encrypt")
+		if err != nil {
+			return err
+		}
+
+		if encrypt {
+			log.Infoln("encrypting file using age")
+			if err := crypto.Encrypt(secretFile, file); err != nil {
+				return err
+			}
+		}
+
+		decrypt, err := cmd.Flags().GetBool("decrypt")
+		if err != nil {
+			return err
+		}
+
+		if decrypt {
+			log.Infoln("decrypting file using age")
+			if err := crypto.Decrypt(secretFile, file); err != nil {
+				return err
+			}
+		}
+
 		return nil
 	},
 }
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		log.Error(err)
 		os.Exit(1)
 	}
 }
@@ -55,7 +77,6 @@ func initConfig() {
 	viper.SetConfigName(".fav")
 
 	if err := viper.ReadInConfig(); err != nil {
-		log.Errorf("Can't read config: %v", err)
 		os.Exit(1)
 	}
 }
