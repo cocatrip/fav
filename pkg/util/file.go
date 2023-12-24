@@ -1,17 +1,28 @@
 package util
 
 import (
+	"io/fs"
 	"os"
+
+	"github.com/cocatrip/fav/pkg/logger"
 )
 
-func ReadFile(name string) (*string, error) {
-	buf, err := os.ReadFile(name)
+var log = logger.GetLogger()
 
+func GetFileSize(file *os.File) int {
+	fileStat, err := file.Stat()
 	if err != nil {
-		return nil, err
+		log.Errorf("cannot stat file: %v", err)
 	}
 
-	result := string(buf)
+	return int(fileStat.Size())
+}
 
-	return &result, nil
+func GetFileMode(file *os.File) fs.FileMode {
+	fileStat, err := file.Stat()
+	if err != nil {
+		log.Errorf("cannot stat file: %v", err)
+	}
+
+	return fileStat.Mode()
 }
