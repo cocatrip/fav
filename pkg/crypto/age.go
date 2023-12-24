@@ -38,34 +38,47 @@ func ageGetIdentityFromFile(secretFile string) *age.X25519Identity {
 	return identity
 }
 
-func ageEncrypt(identity *age.X25519Identity, file string) error {
-	// get the recipient from the identity (age-keygen -y)
+func ageEncrypt(identity *age.X25519Identity, file *os.File) error {
 	recipient := identity.Recipient()
 
-	// buf writer
 	buf := &bytes.Buffer{}
 	armorWriter := armor.NewWriter(buf)
 
 	w, err := age.Encrypt(armorWriter, recipient)
 	if err != nil {
-		log.Errorf("Failed to create encrypted file: %v", err)
-	}
-
-	content, err := util.ReadFile(file)
-	if err != nil {
 		return err
 	}
 
-	if _, err := io.WriteString(w, *content); err != nil {
-		log.Errorf("Failed to write to encrypted file: %v", err)
+	content := make([]byte, util.GetFileSize(file))
+	if _, err := file.Read(content); err != nil {
+		return err
+	}
+
+	if _, err := w.Write(content); err != nil {
+		return err
 	}
 
 	if err := w.Close(); err != nil {
-		log.Errorf("Failed to close encrypted file: %v", err)
+		return err
 	}
 
 	if err := armorWriter.Close(); err != nil {
-		log.Errorf("Failed to close armor: %v", err)
+		return err
+	}
+
+	encryptedFileName := file.Name() + ".age"
+	encryptedFileMode := util.GetFileMode(file)
+	if err := os.WriteFile(encryptedFileName, buf.Bytes(), encryptedFileMode); err != nil {
+		return err
+	}
+
+	log.Infoln(file.Name())
+	if err := os.Remove(file.Name()); err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func ageDecrypt(identity *age.X25519Identity, file *os.File) error {
 	content := make([]byte, util.GetFileSize(file))

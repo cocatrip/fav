@@ -1,10 +1,19 @@
 package crypto
 
-func Encrypt(secretFile string, file string) {
+import "os"
+
+func Encrypt(secretFile string, fileName string) error {
 	identity := ageGetIdentityFromFile(secretFile)
 
-	err := ageEncrypt(identity, file)
+	file, err := os.Open(fileName)
 	if err != nil {
-		return
+		return err
 	}
+	defer file.Close()
+
+	if err := ageEncrypt(identity, file); err != nil {
+		return err
+	}
+
+  return err
 }
