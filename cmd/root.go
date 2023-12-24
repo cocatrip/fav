@@ -2,7 +2,9 @@ package cmd
 
 import (
 	"os"
+	"strings"
 
+	"github.com/cocatrip/fav/pkg/crypto"
 	"github.com/cocatrip/fav/pkg/logger"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -16,6 +18,13 @@ var rootCmd = &cobra.Command{
 	Long:  ``,
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		log.Infof("file: %v\n", args[0])
+		file := args[0]
+
+		log.Infof("secretFile: %v\n", viper.Get("secret-file"))
+		secretFile := viper.GetString("secret-file")
+
+		crypto.Encrypt(secretFile, file)
 		return nil
 	},
 }
@@ -35,9 +44,6 @@ func init() {
 
 	rootCmd.PersistentFlags().StringP("secret-file", "f", "", "path to the secret file")
 	viper.BindPFlag("secret-file", rootCmd.PersistentFlags().Lookup("secret-file"))
-
-	rootCmd.PersistentFlags().StringP("secret-key", "k", "", "secret key to use")
-	viper.BindPFlag("secret-key", rootCmd.PersistentFlags().Lookup("secret-key"))
 }
 
 func initConfig() {
