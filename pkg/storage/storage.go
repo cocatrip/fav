@@ -32,6 +32,9 @@ func (s *Storage) Upload(name string) error {
 			return err
 		}
 	case "s3":
+		if err := s.S3Bucket.Upload(name); err != nil {
+			return err
+		}
 	}
 
 	os.Remove(name)
@@ -46,6 +49,7 @@ func (s *Storage) Download(name string) error {
 	case "gcs":
 		s.GcsBucket.Download(name)
 	case "s3":
+		s.S3Bucket.Download(name)
 	}
 
 	return nil
