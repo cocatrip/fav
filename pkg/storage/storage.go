@@ -28,6 +28,9 @@ func (s *Storage) Upload(name string) error {
 
 	switch s.Type {
 	case "gcs":
+		if err := s.GcsBucket.Upload(name); err != nil {
+			return err
+		}
 	case "s3":
 	}
 
@@ -41,6 +44,7 @@ func (s *Storage) Download(name string) error {
 
 	switch s.Type {
 	case "gcs":
+		s.GcsBucket.Download(name)
 	case "s3":
 	}
 
