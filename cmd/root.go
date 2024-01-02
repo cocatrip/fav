@@ -18,32 +18,27 @@ var rootCmd = &cobra.Command{
 	Long:  ``,
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		log.Infof("file: %v\n", args[0])
 		file := args[0]
+		flags := cmd.Flags()
 
-		log.Infof("secretFile: %v\n", viper.Get("secret-file"))
-		secretFile := viper.GetString("secret-file")
+		encrypt, err := flags.GetBool("encrypt")
+		if err != nil {
+			return err
+		}
 
-		encrypt, err := cmd.Flags().GetBool("encrypt")
+		decrypt, err := flags.GetBool("decrypt")
 		if err != nil {
 			return err
 		}
 
 		if encrypt {
-			log.Infoln("encrypting file using age")
-			if err := crypto.Encrypt(secretFile, file); err != nil {
+			log.Info("encrypt mode")
+			if err := crypto.Encrypt(file); err != nil {
 				return err
 			}
-		}
-
-		decrypt, err := cmd.Flags().GetBool("decrypt")
-		if err != nil {
-			return err
-		}
-
-		if decrypt {
-			log.Infoln("decrypting file using age")
-			if err := crypto.Decrypt(secretFile, file); err != nil {
+		} else if decrypt {
+			log.Info("decrypt mode")
+			if err := crypto.Decrypt(file); err != nil {
 				return err
 			}
 		}
@@ -63,9 +58,6 @@ func init() {
 
 	rootCmd.PersistentFlags().BoolP("encrypt", "e", false, "encrypt a file")
 	rootCmd.PersistentFlags().BoolP("decrypt", "d", false, "decrypt a file")
-
-	rootCmd.PersistentFlags().StringP("secret-file", "f", "", "path to the secret file")
-	viper.BindPFlag("secret-file", rootCmd.PersistentFlags().Lookup("secret-file"))
 }
 
 func initConfig() {
